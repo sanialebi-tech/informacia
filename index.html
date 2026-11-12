@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER QUEST — Інформатика 9 клас</title>
+<style>
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:#fff;
+  background:linear-gradient(135deg,#080c20,#15113a,#071c36);
+  min-height:100vh;
+}
+.container {
+  max-width:850px;
+  margin:auto;
+  padding:25px 16px;
+}
+header { text-align:center; padding:30px 10px; }
+h1 {
+  color:#5ee7ff;
+  font-size:clamp(30px,6vw,48px);
+  text-shadow:0 0 20px #00bfff;
+}
+.subtitle {color:#b8c9ed;}
+.panel {
+  background:#141c37;
+  border:1px solid #344d83;
+  border-radius:18px;
+  padding:25px;
+  margin:18px 0;
+  box-shadow:0 0 25px #071b3d;
+}
+button {
+  border:0;
+  padding:14px 20px;
+  margin:7px 0;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+  transition:.2s;
+}
+button:hover {transform:scale(1.02);}
+.primary {
+  background:linear-gradient(90deg,#00c6ff,#7165ff);
+  color:white;
+  width:100%;
+}
+.answer {
+  display:block;
+  width:100%;
+  text-align:left;
+  background:#253454;
+  color:white;
+  border:1px solid #526a98;
+}
+.answer:hover {background:#36517f;}
+.answer:disabled {cursor:default;opacity:.85;}
+.correct {background:#13794b!important;}
+.wrong {background:#a3314b!important;}
+.stats {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  color:#80eaff;
+  font-weight:bold;
+}
+.progress {
+  height:10px;
+  background:#26334e;
+  border-radius:20px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.bar {
+  height:100%;
+  width:0;
+  background:#39d9ff;
+  transition:.3s;
+}
+#feedback {
+  min-height:50px;
+  line-height:1.5;
+  margin:15px 0;
+}
+.hidden {display:none;}
+footer {
+  text-align:center;
+  color:#8798b9;
+  padding:25px;
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div style="font-size:48px">💻⚡🛡️</div>
+  <h1>CYBER QUEST</h1>
+  <p class="subtitle">Таємниця цифрового світу</p>
+  <p>Інформатика • 9 клас • Розділ 1</p>
+</header>
+
+<section id="start" class="panel">
+  <h2>🚀 Твоя місія</h2>
+  <p>
+    Комп'ютерний світ опинився під загрозою!
+    Система втратила свої дані, програми не працюють,
+    а цифрові пристрої потребують допомоги.
+  </p>
+  <p>
+    Тобі потрібно пройти 15 випробувань,
+    відновити систему та отримати звання
+    МАЙСТРА ЦИФРОВОГО СВІТУ!
+  </p>
+  <p>🏆 За правильну відповідь — 10 балів.</p>
+  <button class="primary" onclick="startGame()">
+    ПОЧАТИ ПРИГОДУ
+  </button>
+</section>
+
+<section id="game" class="panel hidden">
+  <div class="stats">
+    <span id="level">Рівень 1</span>
+    <span id="score">⭐ 0 балів</span>
+    <span id="questionNumber">1 / 15</span>
+  </div>
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+  <h2 id="topic"></h2>
+  <h3 id="question"></h3>
+  <div id="answers"></div>
+  <div id="feedback"></div>
+  <button id="next" class="primary hidden"
+    onclick="nextQuestion()">НАСТУПНЕ ЗАВДАННЯ →</button>
+</section>
+
+<section id="result" class="panel hidden">
+  <h2>🏆 МІСІЮ ЗАВЕРШЕНО!</h2>
+  <div style="font-size:55px;text-align:center" id="medal">🥇</div>
+  <h2 id="finalScore" style="text-align:center"></h2>
+  <h3 id="finalRank" style="text-align:center;color:#5ee7ff"></h3>
+  <p id="finalText"></p>
+  <button class="primary" onclick="restartGame()">
+    🔄 ПРОЙТИ ЩЕ РАЗ
+  </button>
+</section>
+
+<footer>
+  CYBER QUEST | Навчальний проєкт з інформатики
+  <br>За матеріалами розділу 1 підручника Ривкінд, 2026
+</footer>
+</div>
+
+<script>
+const questions = [
+{
+ topic:"РІВЕНЬ 1 — Інформаційні системи",
+ q:"Що таке інформаційна система?",
+ a:["Сукупність засобів для збирання, зберігання, опрацювання та передавання інформації",
+    "Лише комп'ютер",
+    "Тільки мережа Інтернет"],
+ c:0,
+ e:"Інформаційна система об'єднує технічні та програмні засоби, дані й людей для роботи з інформацією."
+},
+{
+ topic:"РІВЕНЬ 1 — Інформаційні системи",
+ q:"Який процес означає збереження інформації для подальшого використання?",
+ a:["Передавання","Зберігання","Опрацювання"],
+ c:1,
+ e:"Зберігання забезпечує можливість використати інформацію пізніше."
+},
+{
+ topic:"РІВЕНЬ 1 — Інформаційні системи",
+ q:"Що належить до інформаційних процесів?",
+ a:["Збирання, зберігання, опрацювання, передавання",
+    "Лише друкування",
+    "Тільки запуск комп'ютера"],
+ c:0,
+ e:"Основні інформаційні процеси — збирання, зберігання, опрацювання та передавання даних."
+},
+{
+ topic:"РІВЕНЬ 2 — Програмне забезпечення",
+ q:"Що таке програмне забезпечення?",
+ a:["Набір комп'ютерних пристроїв",
+    "Сукупність програм, які забезпечують роботу комп'ютера",
+    "Лише файли зображень"],
+ c:1,
+ e:"Програмне забезпечення — сукупність програм, необхідних для роботи комп'ютера."
+},
+{
+ topic:"РІВЕНЬ 2 — Програмне забезпечення",
+ q:"Яка програма є прикладною?",
+ a:["Текстовий редактор",
+    "Драйвер клавіатури",
+    "Операційна система"],
+ c:0,
+ e:"Текстовий редактор допомагає користувачу виконувати конкретні завдання."
+},
+{
+ topic:"РІВЕНЬ 2 — Ліцензії",
+ q:"Що визначає ліцензія на програмне забезпечення?",
+ a:["Колір програми",
+    "Умови використання програми",
+    "Швидкість Інтернету"],
+ c:1,
+ e:"Ліцензія визначає права та обмеження користувача щодо програмного продукту."
+},
+{
+ topic:"РІВЕНЬ 2 — Ліцензії",
+ q:"Яке програмне забезпечення можна використовувати безкоштовно відповідно до умов його ліцензії?",
+ a:["Freeware",
+    "Лише платне ПЗ",
+    "Будь-яку піратську програму"],
+ c:0,
+ e:"Freeware — безкоштовне програмне забезпечення. Безкоштовність не означає відсутність авторських прав."
+},
+{
+ topic:"РІВЕНЬ 3 — Операційні системи",
+ q:"Яке основне призначення операційної системи?",
+ a:["Створювати лише презентації",
+    "Керувати ресурсами комп'ютера та забезпечувати взаємодію користувача з ним",
+    "Замінювати процесор"],
+ c:1,
+ e:"Операційна система керує пристроями, файлами, програмами та роботою комп'ютера."
+},
+{
+ topic:"РІВЕНЬ 3 — Операційні системи",
+ q:"Яка з наведених систем є операційною?",
+ a:["Windows",
+    "PowerPoint",
+    "Photoshop"],
+ c:0,
+ e:"Windows — операційна система. PowerPoint і Photoshop — прикладні програми."
+},
+{
+ topic:"РІВЕНЬ 3 — Драйвери",
+ q:"Для чого потрібні драйвери?",
+ a:["Для створення малюнків",
+    "Для забезпечення взаємодії операційної системи з пристроями",
+    "Для перегляду вебсайтів"],
+ c:1,
+ e:"Драйвер допомагає операційній системі взаємодіяти з конкретним обладнанням."
+},
+{
+ topic:"РІВЕНЬ 4 — Сумісність програм",
+ q:"Що означає сумісність програмного забезпечення?",
+ a:["Можливість програми працювати в певному середовищі або з певною системою",
+    "Однаковий колір усіх програм",
+    "Однакова назва файлів"],
+ c:0,
+ e:"Сумісність означає можливість коректної роботи програми з операційною системою та обладнанням."
+},
+{
+ topic:"РІВЕНЬ 4 — Інсталяція",
+ q:"Що означає інсталяція програми?",
+ a:["Видалення програми",
+    "Установлення програми на комп'ютер",
+    "Перейменування файлу"],
+ c:1,
+ e:"Інсталяція — процес установлення програмного забезпечення."
+},
+{
+ topic:"РІВЕНЬ 4 — Деінсталяція",
+ q:"Що таке деінсталяція?",
+ a:["Видалення встановленої програми",
+    "Створення резервної копії",
+    "Увімкнення комп'ютера"],
+ c:0,
+ e:"Деінсталяція — процес видалення програмного забезпечення із системи."
+},
+{
+ topic:"РІВЕНЬ 5 — Цифрова доступність",
+ q:"Для чого призначені програми екранного читання?",
+ a:["Для прискорення процесора",
+    "Для озвучування тексту та елементів інтерфейсу",
+    "Для видалення файлів"],
+ c:1,
+ e:"Екранні читачі допомагають людям із порушеннями зору користуватися цифровими пристроями."
+},
+{
+ topic:"ФІНАЛ — Цифрова доступність",
+ q:"Який спосіб допомагає користувачам із порушеннями слуху?",
+ a:["Субтитри до відео",
+    "Збільшення швидкості процесора",
+    "Вимкнення монітора"],
+ c:0,
+ e:"Субтитри передають мовленнєву інформацію у текстовій формі."
+}
+];
+
+let current = 0;
+let score = 0;
+let mistakes = 0;
+let answered = false;
+
+function startGame() {
+ document.getElementById("start").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ showQuestion();
+}
+
+function showQuestion() {
+ answered = false;
+ const q = questions[current];
+
+ document.getElementById("level").textContent =
+   "Завдання " + (current + 1);
+ document.getElementById("score").textContent =
+   "⭐ " + score + " балів";
+ document.getElementById("questionNumber").textContent =
+   (current + 1) + " / " + questions.length;
+ document.getElementById("bar").style.width =
+   (current / questions.length * 100) + "%";
+
+ document.getElementById("topic").textContent = q.topic;
+ document.getElementById("question").textContent = q.q;
+ document.getElementById("feedback").textContent = "";
+ document.getElementById("next").classList.add("hidden");
+
+ const box = document.getElementById("answers");
+ box.innerHTML = "";
+
+ q.a.forEach((answer,index) => {
+   const btn = document.createElement("button");
+   btn.className = "answer";
+   btn.textContent = String.fromCharCode(65+index) + ". " + answer;
+   btn.onclick = () => checkAnswer(index,btn);
+   box.appendChild(btn);
+ });
+}
+
+function checkAnswer(index,button) {
+ if(answered) return;
+ answered = true;
+
+ const q = questions[current];
+ const buttons = document.querySelectorAll(".answer");
+
+ buttons.forEach((b,i) => {
+   b.disabled = true;
+   if(i === q.c) b.classList.add("correct");
+ });
+
+ const feedback = document.getElementById("feedback");
+
+ if(index === q.c) {
+   score += 10;
+   feedback.innerHTML =
+    "✅ <b style='color:#54f3a5'>Правильно! +10 балів</b><br>" + q.e;
+ } else {
+   mistakes++;
+   button.classList.add("wrong");
+   feedback.innerHTML =
+    "❌ <b style='color:#ff8297'>Неправильно!</b><br>" + q.e;
+ }
+
+ document.getElementById("score").textContent =
+   "⭐ " + score + " балів";
+
+ document.getElementById("next").classList.remove("hidden");
+ document.getElementById("next").textContent =
+   current === questions.length - 1 ?
+   "ЗАВЕРШИТИ КВЕСТ 🏆" : "НАСТУПНЕ ЗАВДАННЯ →";
+}
+
+function nextQuestion() {
+ current++;
+ if(current < questions.length) {
+   showQuestion();
+ } else {
+   finishGame();
+ }
+}
+
+function finishGame() {
+ document.getElementById("game").classList.add("hidden");
+ document.getElementById("result").classList.remove("hidden");
+
+ const percent = Math.round(score / (questions.length*10) * 100);
+
+ let rank,medal,message;
+
+ if(percent >= 90) {
+   rank = "МАЙСТЕР ЦИФРОВОГО СВІТУ";
+   medal = "🏆";
+   message = "Неймовірно! Ти чудово знаєш програмне забезпечення!";
+ } else if(percent >= 70) {
+   rank = "КІБЕРЕКСПЕРТ";
+   medal = "🥇";
+   message = "Чудовий результат! Ти добре засвоїв матеріал.";
+ } else if(percent >= 50) {
+   rank = "ЦИФРОВИЙ ДОСЛІДНИК";
+   medal = "🥈";
+   message = "Непогано! Ще трохи практики — і ти станеш експертом.";
+ } else {
+   rank = "ПОЧАТКІВЕЦЬ";
+   medal = "🥉";
+   message = "Не здавайся! Повтори матеріал і спробуй ще раз.";
+ }
+
+ document.getElementById("medal").textContent = medal;
+ document.getElementById("finalScore").textContent =
+   score + " / 150 балів (" + percent + "%)";
+ document.getElementById("finalRank").textContent = rank;
+ document.getElementById("finalText").textContent =
+   message + " Помилок: " + mistakes + ".";
+ document.getElementById("bar").style.width = "100%";
+}
+
+function restartGame() {
+ current = 0;
+ score = 0;
+ mistakes = 0;
+ document.getElementById("result").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ showQuestion();
+}
+</script>
+</body>
+</html>
